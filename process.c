@@ -5,6 +5,14 @@ void process(FILE *stream) {
 	char c;
 	char *memory = (char *) malloc(MEM_CHUNK);
 	char *p = memory;
+	int curchar = 0;
+	int *bracks = (int *) malloc(MEM_CHUNK * sizeof(int));
+	int *bp = bracks;
+
+	*memory = 1;
+	p++;
+	*bracks = 1;
+	bp++;
 
 	while ((c = getc(stream)) != EOF) {
 		switch(c) {
@@ -15,8 +23,8 @@ void process(FILE *stream) {
 				(*p)--;
 				break;
 			case '>':
-				if (p + 1 > memory + sizeof(memory))
-					memory = (char *) realloc(memory, sizeof(memory) + MEM_CHUNK);
+				if (p + 1 > memory + *memory * MEM_CHUNK)
+					memory = (char *) realloc(memory, ++*memory * MEM_CHUNK);
 				p++;
 				break;
 			case '<':
@@ -25,16 +33,27 @@ void process(FILE *stream) {
 				p--;
 				break;
 			case '.':
-				putchar(*p);
+				printf("%c", *p);
 				break;
 			case ',':
 				*p = getchar();
 				break;
-			/* case '[': */
-					
-
+			case '[':
+				if (*bracks * MEM_CHUNK < bp + 1 - bracks)
+					bracks = (int *) realloc(bracks, ++*bracks * MEM_CHUNK * sizeof(int));
+				*(bp++) = curchar;
+				break;
+			case ']':
+				if (*p)
+					fseek(stream, *(bp - 1) + 1, SEEK_SET);
+				else
+					bp--;
+				break;
 		}
+
+		curchar++;
 	}
 	putchar('\n');
 	free(memory);
+	free(bracks);
 }
