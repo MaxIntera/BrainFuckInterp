@@ -1,5 +1,5 @@
 #include "interp.h"
-#define MEM_CHUNK 64
+#define MEM_CHUNK 256
 
 void process(FILE *stream) {
 	char c;
@@ -15,6 +15,11 @@ void process(FILE *stream) {
 	bp++;
 
 	while ((c = getc(stream)) != EOF) {
+	
+#ifdef DEBUG
+		printf("%c :: %d %d \n", c, memory[1], memory[2]);
+#endif
+
 		switch(c) {
 			case '+':
 				(*p)++;
@@ -33,7 +38,12 @@ void process(FILE *stream) {
 				p--;
 				break;
 			case '.':
+#ifdef DEBUG
+				printf("<%d>\n", *p);
+#endif
+#ifndef DEBUG
 				printf("%c", *p);
+#endif
 				break;
 			case ',':
 				*p = getchar();
